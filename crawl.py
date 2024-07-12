@@ -32,7 +32,7 @@ def main():
         metadata = doc_metadata(doc_id)
         logging.info('found metadata {metadata}')
         output.writerow(metadata)
-        #download_pdfs(metadata)
+        download_pdfs(metadata)
 
 
 def doc_ids():
