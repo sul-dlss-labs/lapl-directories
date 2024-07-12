@@ -1,6 +1,6 @@
 # lapl-directories
 
-Explore phone directories in the Los Angeles Public Library:
+Download metadata and PDFs for phone directories in the Los Angeles Public Library:
 
 https://rescarta.lapl.org/
 
@@ -14,6 +14,8 @@ https://rescarta.lapl.org/
 
 To generate a CSV of the phone directories and the number of pages in each:
 
-    ./metadata.py > metadata.csv
+    ./crawl.py
+    
+NOTE: as a courtesy please enter your email address when prompted to let LAPL know you are crawling this content.
 
 

@@ -9,26 +9,30 @@ touch with you about the crawling.
 """
 
 import csv
-import re
+import logging
 import pathlib
+import re
 import time
+import tqdm
 
 import requests_html
+
 
 email = input("As a courtesy to LAPL enter your email address to use as a User-Agent: ")
 http = requests_html.HTMLSession()
 http.headers = {"User-Agent": email}
 
+
 def main():
+    logging.basicConfig(filename="crawl.log", level=logging.INFO)
     output = csv.DictWriter(open('metadata.csv', 'w'), fieldnames=['doc_id', 'url', 'title', 'num_pages'])
     output.writeheader()
     for doc_id in doc_ids():
+        logging.info(f'found doc_id {doc_id}')
         metadata = doc_metadata(doc_id)
-        print(f"found {metadata['doc_id']} with {metadata['num_pages']} pages")
-
+        logging.info('found metadata {metadata}')
         output.writerow(metadata)
-        download_pdfs(metadata['doc_id'], metadata['num_pages'])
-        break
+        #download_pdfs(metadata)
 
 
 def doc_ids():
@@ -69,19 +73,23 @@ def doc_metadata(doc_id):
     resp.html.render()
 
     title = resp.html.find('#rc-obj-title-div span', first=True).text
-    num_pages = len(resp.html.find('.jqtree-folder ul li'))
+    num_pages = len(resp.html.find('.jqtree-folder ul li')) - 1
 
     return {
-        "url": "https://rescarta.lapl.org/ResCarta-Web/jsp/RcWebImageViewer.jsp?doc_id={doc_id}",
+        "url": f"https://rescarta.lapl.org/ResCarta-Web/jsp/RcWebImageViewer.jsp?doc_id={doc_id}",
         "doc_id": doc_id,
         "title": title,
         "num_pages": num_pages
     }
 
 
-def download_pdfs(doc_id, num_pages):
-    for page_num in range(1, num_pages + 1):
-        time.sleep(1)
+def download_pdfs(metadata):
+    doc_id = metadata['doc_id']
+    num_pages = metadata['num_pages']
+    title = metadata['title']
+
+    for page_num in tqdm.tqdm(range(1, num_pages + 1), desc=title[0:30]):
+        time.sleep(1.5)
 
         output_dir = pathlib.Path(f'data/{doc_id}')
         if not output_dir.is_dir():
@@ -89,7 +97,7 @@ def download_pdfs(doc_id, num_pages):
         
         output_file = output_dir / ("%09i.pdf" % page_num)
         if output_file.is_file():
-            print(f"skipping {doc_id} page={page_num}")
+            logging.info(f"skipping {doc_id} page={page_num}")
             continue
         
         params = {
@@ -101,10 +109,8 @@ def download_pdfs(doc_id, num_pages):
         resp.raise_for_status()
 
         output_file.open('wb').write(resp.content)
-        print(f"downloaded {doc_id} page={page_num}")
+        logging.info(f"downloaded {params}")
 
 
 if __name__ == "__main__":
     main()
-
-
