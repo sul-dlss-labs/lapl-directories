@@ -12,7 +12,7 @@ https://rescarta.lapl.org/
     
 ## Run
 
-To generate a CSV of the phone directories and the number of pages in each:
+To generate a CSV of metadata for the titles, and download the PDFs for each page:
 
     ./crawl.py
     
