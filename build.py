@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+"""
+This program walks the crawled data stored in the "data" directory, and adds
+each page PDF to a single title PDF. The aggregated PDF is then written to the
+data directory using the document ID.
+"""
+
 import glob
 import pathlib
 
