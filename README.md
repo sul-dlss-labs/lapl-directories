@@ -10,12 +10,19 @@ https://rescarta.lapl.org/
     source .venv/bin/activate
     uv pip install -r requirements.txt
     
-## Run
+## Crawl
 
 To generate a CSV of metadata for the titles, and download the PDFs for each page:
 
     ./crawl.py
     
 NOTE: as a courtesy please enter your email address when prompted to let LAPL know you are crawling this content.
+
+## Build
+
+Once the crawling is done you can build a single PDF for each title:
+
+    ./build.py
+
 
 
