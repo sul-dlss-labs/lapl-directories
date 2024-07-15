@@ -33,7 +33,7 @@ def main():
 
 
 def document_dirs():
-    return [Path(d) for d in Path('data').glob("*/*/*/*")]
+    return [Path(d) for d in Path("data").glob("*/*/*/*")]
 
 
 main()

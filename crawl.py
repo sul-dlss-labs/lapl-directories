@@ -20,7 +20,9 @@ import requests_html
 
 email = input("As a courtesy to LAPL enter your email address to use as a User-Agent: ")
 http = requests_html.HTMLSession()
-http.headers = {"User-Agent": "https://github.com/sul-dlss-labs/lapl-directories on behalf of {email}"}
+http.headers = {
+    "User-Agent": "https://github.com/sul-dlss-labs/lapl-directories on behalf of {email}"
+}
 
 
 def main():
@@ -94,7 +96,6 @@ def download_pdfs(metadata):
     title = metadata["title"]
 
     for page_num in tqdm.tqdm(range(1, num_pages + 1), desc=title[0:30]):
-
         output_dir = pathlib.Path(f"data/{doc_id}")
         if not output_dir.is_dir():
             output_dir.mkdir(parents=True)
@@ -117,6 +118,7 @@ def download_pdfs(metadata):
 
         # be nice
         time.sleep(1.5)
+
 
 if __name__ == "__main__":
     main()
