@@ -28,7 +28,26 @@ http.headers = {
 def main():
     logging.basicConfig(filename="crawl.log", level=logging.INFO)
     output = csv.DictWriter(
-        open("metadata.csv", "w"), fieldnames=["doc_id", "url", "title", "num_pages"]
+        open("metadata.csv", "w"),
+        fieldnames=[
+            "id",
+            "url",
+            "title",
+            "num_pages",
+            "type_of_resource",
+            "genre_authority",
+            "language",
+            "date_captured",
+            "place_of_publication",
+            "subject_geographic",
+            "subject_topic",
+            "publisher_name",
+            "collection",
+            "volume",
+            "genre",
+            "date_published",
+            "owner"
+        ],
     )
     output.writeheader()
     for doc_id in doc_ids():
@@ -76,22 +95,29 @@ def doc_metadata(doc_id):
     resp = http.get(url, params={"doc_id": doc_id})
     resp.html.render()
 
-    title = resp.html.find("#rc-obj-title-div span", first=True).text
-    num_pages = len(resp.html.find(".jqtree-folder ul li")) - 1
-
-    # get table of metadata as well, e.g.
-    # GET https://rescarta.lapl.org/ResCarta-Web/jsp/RcWebMetadataViewer.jsp?doc_id=040428be-8b21-4de1-9b1e-3421068c0f1c/cl000000/20140507/00000026&pg_seq=1&search_doc=
-
-    return {
+    metadata = {
         "url": f"https://rescarta.lapl.org/ResCarta-Web/jsp/RcWebImageViewer.jsp?doc_id={doc_id}",
-        "doc_id": doc_id,
-        "title": title,
-        "num_pages": num_pages,
+        "title": resp.html.find("#rc-obj-title-div span", first=True).text,
+        "num_pages": len(resp.html.find(".jqtree-folder ul li")) - 1
     }
+
+    # get more metadata details from the pop out table
+    url = "https://rescarta.lapl.org/ResCarta-Web/jsp/RcWebMetadataViewer.jsp"
+    resp = http.get(url, params={"doc_id": doc_id, "pg_seq": 1})
+    resp.html.render()
+
+    for tr in resp.html.find('table tr'):
+        cells = tr.find('td')
+        name = cells[0].text.lower().replace(' ', '_')
+        value = cells[1].text
+        if name not in ['height', 'width']:
+            metadata[name] = value
+
+    return metadata
 
 
 def download_pdfs(metadata):
-    doc_id = metadata["doc_id"]
+    doc_id = metadata["id"]
     num_pages = metadata["num_pages"]
     title = metadata["title"]
 

@@ -12,12 +12,11 @@ import pypdf
 
 
 def main():
+    count = 0
     for doc_dir in document_dirs():
-        print(f"generating pdf for {doc_dir}")
-
+        count += 1 
         pdf = pypdf.PdfWriter()
         for pdf_file in sorted(doc_dir.iterdir()):
-            print(f"adding {pdf_file}")
             with pdf_file.open("rb") as fh:
                 pdf.append(fh, pages=(0, 1))
 
@@ -29,7 +28,7 @@ def main():
         pdf.write(output_path.open("wb"))
         pdf.close()
 
-        print(f"wrote {output_path}")
+        print(f"{count:03n} {output_path.name}")
 
 
 def document_dirs():
